@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.CheckBox;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +21,7 @@ public class MyAccessibility extends AccessibilityService {
 
     @Override
     public void onInterrupt() {
+        Log.d(TAG, "onInterrupt");
     }
 
     @Override
@@ -45,36 +45,22 @@ public class MyAccessibility extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         // 确定需要时才执行
-        if (currentStep > 3 || currentStep < 0) {
+        boolean disable = TextUtils.isEmpty(name);
+        if (disable) {
+            Log.d(TAG, "name is empty, disable");
             return;
         }
         Log.d(TAG, "onAccessibilityEvent: " + event.toString());
         String className = event.getClassName().toString();
         Log.d(TAG, "onAccessibilityEvent class: " + className);
-        boolean disable = TextUtils.isEmpty(name);
-        if (disable) {
-            return;
-        }
+
         int eventType = event.getEventType();
+        AccessibilityNodeInfo rootWindowNode = getRootInActiveWindow();
         switch (eventType) {
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
-//                if (className.equals("com.tencent.mm.ui.LauncherUI")) { // 进入首页, 点击对应的用户. 因为列表刷新有延迟, 需要sleep一下
-//                    try {
-//                        Thread.sleep(2000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    findViewByNameAndClick(name);//state change
-//                } else
-//                if (className.equals("com.tencent.mm.ui.base.k")) {// 视频语音聊天选择
-//                    sleep(1000);
-//                    findViewByNameAndClick("语音聊天");
-//                    name = null; // 只点击一次
-//                }
-//                break;
             case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
                 if (0 == currentStep) {
-                    AccessibilityNodeInfo node = findNodeByName(getRootInActiveWindow(), name);
+                    AccessibilityNodeInfo node = findNodeByName(rootWindowNode, name);
                     if (node != null) {
                         Log.d(TAG, "step 0 finish");
                         clickNodeAndParent(node);
@@ -83,7 +69,7 @@ public class MyAccessibility extends AccessibilityService {
                     }
                 } else if (1 == currentStep) {
                     // 找到更多按钮
-                    AccessibilityNodeInfo node = findNodeByDescription(getRootInActiveWindow(), "更多功能按钮，");
+                    AccessibilityNodeInfo node = findNodeByDescription(rootWindowNode, "更多功能按钮，");
                     if (node != null) {
                         Log.d(TAG, "step 1 finish");
                         clickNodeAndParent(node);
@@ -92,15 +78,15 @@ public class MyAccessibility extends AccessibilityService {
                     }
                 } else if (2 == currentStep) {
                     // 找到视频聊天
-                    AccessibilityNodeInfo node = findNodeByName(getRootInActiveWindow(), "视频聊天");
+                    AccessibilityNodeInfo node = findNodeByName(rootWindowNode, "视频聊天");
                     if (node != null) {
                         Log.d(TAG, "step 2 finish");
                         clickNodeAndParent(node);
                         currentStep++;
                         node.recycle();
                     } else {
-                        // 旧版本微信语音聊天入口叫 "语音聊天", 新版本才叫视频聊天. 这里做一下兼容
-                        node = findNodeByName(getRootInActiveWindow(), "语音聊天");
+                        // 群语音聊天入口叫 "语音聊天", 个人才叫视频聊天. 这里做一下兼容
+                        node = findNodeByName(rootWindowNode, "语音聊天");
                         if (node != null) {
                             Log.d(TAG, "step 2 finish");
                             clickNodeAndParent(node);
@@ -112,7 +98,7 @@ public class MyAccessibility extends AccessibilityService {
                     if (isGroupChat) {
                         // 找到ListView下面的所有CheckBox
                         try {
-                                List<AccessibilityNodeInfo> checkList = findNodeByClass(getRootInActiveWindow(), CheckBox.class.getName());
+                                List<AccessibilityNodeInfo> checkList = findNodeByClass(rootWindowNode, CheckBox.class.getName());
                             if (checkList.size() > 0) {
                                 for (AccessibilityNodeInfo checkBox : checkList) {
                                     if (!checkBox.isChecked()) {
@@ -120,7 +106,7 @@ public class MyAccessibility extends AccessibilityService {
                                     }
                                     checkBox.recycle();
                                 }
-                                AccessibilityNodeInfo nodeInfo = findNodeByName(getRootInActiveWindow(), "开始");
+                                AccessibilityNodeInfo nodeInfo = findNodeByName(rootWindowNode, "开始");
                                 if (nodeInfo != null) {
                                     clickNodeAndParent(nodeInfo);
                                     nodeInfo.recycle();
@@ -131,13 +117,14 @@ public class MyAccessibility extends AccessibilityService {
                             e.printStackTrace();
                         }
                     } else {
-                        clickVideoChat();
+                        clickVideoChat(rootWindowNode);
                     }
                 } else if (4 == currentStep) {
-                    clickVideoChat();
+                    clickVideoChat(rootWindowNode);
                 }
                 break;
         }
+        rootWindowNode.recycle();
     }
 
     private List<AccessibilityNodeInfo> findNodeByClass(AccessibilityNodeInfo node, String name) {
@@ -182,13 +169,13 @@ public class MyAccessibility extends AccessibilityService {
         return null;
     }
 
-    private void clickVideoChat() {
+    private void clickVideoChat(AccessibilityNodeInfo rootWindowNode) {
         // 找到视频聊天
         AccessibilityNodeInfo node;
         if (isVideoChat) {
-            node = findNodeByName(getRootInActiveWindow(), "视频聊天");
+            node = findNodeByName(rootWindowNode, "视频聊天");
         } else {
-            node = findNodeByName(getRootInActiveWindow(), "语音聊天");
+            node = findNodeByName(rootWindowNode, "语音聊天");
         }
         if (node != null) {
             Log.d(TAG, "step 3 finish");
@@ -198,40 +185,6 @@ public class MyAccessibility extends AccessibilityService {
             Log.d(TAG, "stop service");
             node.recycle();
             stopSelf();
-        }
-    }
-
-    /**
-     * 模拟点击
-     */
-    private boolean findViewByNameAndClick(String name) {
-        Log.d(TAG, "findViewByNameAndClick: " + name);
-        AccessibilityNodeInfo rootNode = getRootInActiveWindow();
-        AccessibilityNodeInfo node = findNodeByName(rootNode, name);
-
-        if (node == null) {
-            Log.d(TAG, "findViewByNameAndClick fail: " + name);
-            return false;
-        } else {
-            clickNodeAndParent(node);
-            return true;
-        }
-    }
-
-    /**
-     * 找到对应的控件并且点击
-     *
-     * @param name
-     */
-    private void findViewByDescriptionAndClick(String name) {
-        Log.d(TAG, "findViewByDescriptionAndClick: " + name);
-        AccessibilityNodeInfo rootNode = getRootInActiveWindow();
-        AccessibilityNodeInfo node = findNodeByDescription(rootNode, name);
-
-        if (node == null) {
-            Log.d(TAG, "findViewByNameAndClick fail: " + name);
-        } else {
-            clickNodeAndParent(node);
         }
     }
 
