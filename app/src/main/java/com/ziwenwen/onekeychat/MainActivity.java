@@ -22,9 +22,11 @@ public class MainActivity extends AppCompatActivity {
 
     EditText etName;
     CheckBox cbVideoChat;
+    CheckBox cbGroupChat;
 
     String name;
     boolean isVideoChat;
+    boolean isGroupChat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
         if (getIntent().hasExtra("name")) {
             name = getIntent().getStringExtra("name");
             isVideoChat = getIntent().getBooleanExtra("isVideoChat", false);
-            oneKeyChat(name, isVideoChat);
+            isGroupChat = getIntent().getBooleanExtra("isGroupChat", false);
+            oneKeyChat(name, isVideoChat, isGroupChat);
             finish();
             return;
         }
@@ -43,16 +46,28 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences preferences = openSharedPreferences();
         name = preferences.getString("name", null);
         isVideoChat = preferences.getBoolean("isVideoChat", false);
+        isGroupChat = preferences.getBoolean("isGroupChat", false);
         if (!TextUtils.isEmpty(name)) {
             showOneKeyBtn();
         }
 
         etName = (EditText) findViewById(R.id.et_name);
+        // 视频聊天
         cbVideoChat = (CheckBox) findViewById(R.id.cb_video_chat);
+        cbVideoChat.setChecked(isVideoChat);
         cbVideoChat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 isVideoChat = isChecked;
+            }
+        });
+        // 群聊天
+        cbGroupChat = (CheckBox) findViewById(R.id.cb_group_chat);
+        cbGroupChat.setChecked(isGroupChat);
+        cbGroupChat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                isGroupChat = isChecked;
             }
         });
 
@@ -68,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        oneKeyChat(etName.getText().toString(), isVideoChat);
+                        oneKeyChat(etName.getText().toString(), isVideoChat, isGroupChat);
                     }
                 });
 
@@ -76,14 +91,14 @@ public class MainActivity extends AppCompatActivity {
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        createShotCut(MainActivity.this, MainActivity.class, etName.getText().toString(), isVideoChat);
+                        createShotCut(MainActivity.this, MainActivity.class, etName.getText().toString(), isVideoChat, isGroupChat);
                     }
                 });
         findViewById(R.id.btn_one_key_chat)
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        oneKeyChat(name, isVideoChat);
+                        oneKeyChat(name, isVideoChat, isGroupChat);
                     }
                 });
         findViewById(R.id.btn_complete)
@@ -95,11 +110,11 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "请输入微信昵称", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        isVideoChat = cbVideoChat.isChecked();
                         SharedPreferences preferences = openSharedPreferences();
                         preferences.edit()
                                 .putString("name", name)
                                 .putBoolean("isVideoChat", isVideoChat)
+                                .putBoolean("isGroupChat", isGroupChat)
                                 .apply();
                         showOneKeyBtn();
                     }
@@ -124,12 +139,13 @@ public class MainActivity extends AppCompatActivity {
                 .setVisibility(View.VISIBLE);
     }
 
-    private void oneKeyChat(String name, boolean isVideoChat) {
+    private void oneKeyChat(String name, boolean isVideoChat, boolean isGroupChat) {
         try {
             // 启动监听
             Intent intent = new Intent(MainActivity.this, MyAccessibility.class);
             intent.putExtra("name", name);
             intent.putExtra("isVideoChat", isVideoChat);
+            intent.putExtra("isGroupChat", isGroupChat);
             startService(intent);
             // 打开微信首页
             intent = new Intent();
@@ -147,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void createShotCut(Context context, Class<?> clazz, String name, boolean isVideoChat) {
+    public void createShotCut(Context context, Class<?> clazz, String name, boolean isVideoChat, boolean isGroupChat) {
 
         Intent shortcutIntent = new Intent(Intent.ACTION_MAIN);
 
@@ -159,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
         bundle.putBoolean("isVideoChat", isVideoChat);
+        bundle.putBoolean("isGroupChat", isGroupChat);
         shortcutIntent.putExtras(bundle);
         /**
          * 设置这条属性，可以使点击快捷方式后关闭其他的任务栈的其他activity，然后创建指定的acticity

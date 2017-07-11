@@ -6,12 +6,18 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.CheckBox;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MyAccessibility extends AccessibilityService {
 
     private static final String TAG = "MyAccessibility";
     private String name;
     private boolean isVideoChat;
+    private boolean isGroupChat;
     int currentStep =  -1;
 
     @Override
@@ -24,9 +30,16 @@ public class MyAccessibility extends AccessibilityService {
             currentStep = 0;
             name = intent.getStringExtra("name");
             isVideoChat = intent.getBooleanExtra("isVideoChat", false);
+            isGroupChat = intent.getBooleanExtra("isGroupChat", false);
             Log.d(TAG, "onStartCommand:" + name);
         }
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy");
+        super.onDestroy();
     }
 
     @Override
@@ -66,6 +79,7 @@ public class MyAccessibility extends AccessibilityService {
                         Log.d(TAG, "step 0 finish");
                         clickNodeAndParent(node);
                         currentStep++;
+                        node.recycle();
                     }
                 } else if (1 == currentStep) {
                     // 找到更多按钮
@@ -74,6 +88,7 @@ public class MyAccessibility extends AccessibilityService {
                         Log.d(TAG, "step 1 finish");
                         clickNodeAndParent(node);
                         currentStep++;
+                        node.recycle();
                     }
                 } else if (2 == currentStep) {
                     // 找到视频聊天
@@ -82,23 +97,107 @@ public class MyAccessibility extends AccessibilityService {
                         Log.d(TAG, "step 2 finish");
                         clickNodeAndParent(node);
                         currentStep++;
+                        node.recycle();
+                    } else {
+                        // 旧版本微信语音聊天入口叫 "语音聊天", 新版本才叫视频聊天. 这里做一下兼容
+                        node = findNodeByName(getRootInActiveWindow(), "语音聊天");
+                        if (node != null) {
+                            Log.d(TAG, "step 2 finish");
+                            clickNodeAndParent(node);
+                            currentStep++;
+                            node.recycle();
+                        }
                     }
                 } else if (3 == currentStep) {
-                    // 找到视频聊天
-                    AccessibilityNodeInfo node;
-                    if (isVideoChat) {
-                        node = findNodeByName(getRootInActiveWindow(), "视频聊天");
+                    if (isGroupChat) {
+                        // 找到ListView下面的所有CheckBox
+                        try {
+                                List<AccessibilityNodeInfo> checkList = findNodeByClass(getRootInActiveWindow(), CheckBox.class.getName());
+                            if (checkList.size() > 0) {
+                                for (AccessibilityNodeInfo checkBox : checkList) {
+                                    if (!checkBox.isChecked()) {
+                                        clickNodeAndParent(checkBox);
+                                    }
+                                    checkBox.recycle();
+                                }
+                                AccessibilityNodeInfo nodeInfo = findNodeByName(getRootInActiveWindow(), "开始");
+                                if (nodeInfo != null) {
+                                    clickNodeAndParent(nodeInfo);
+                                    nodeInfo.recycle();
+                                    currentStep ++;
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     } else {
-                        node = findNodeByName(getRootInActiveWindow(), "语音聊天");
+                        clickVideoChat();
                     }
-                    if (node != null) {
-                        Log.d(TAG, "step 3 finish");
-                        clickNodeAndParent(node);
-                        currentStep++;
-                        name = null;
-                    }
+                } else if (4 == currentStep) {
+                    clickVideoChat();
                 }
                 break;
+        }
+    }
+
+    private List<AccessibilityNodeInfo> findNodeByClass(AccessibilityNodeInfo node, String name) {
+        List<AccessibilityNodeInfo> list = new ArrayList<>();
+        if (node.getChildCount() == 0) {
+            Log.d(TAG, "findNodeByClass:" + node.getClassName());
+            if (name.equals(node.getClassName())) {
+                list.add(node);
+            } else {
+                node.recycle();
+            }
+        } else {
+            for (int i = 0; i < node.getChildCount(); i++) {
+                if (node.getChild(i) != null) {
+                    List<AccessibilityNodeInfo> ret = findNodeByClass(node.getChild(i), name);
+                    if (ret != null && ret.size() > 0) {
+                        list.addAll(ret);
+                    }
+                }
+            }
+        }
+        return list;
+    }
+    private AccessibilityNodeInfo findOneNodeByClass(AccessibilityNodeInfo node, String name) {
+        if (node.getChildCount() == 0) {
+            CharSequence className = node.getClassName();
+            Log.d(TAG, "findOneNodeByClass:" + className);
+            if (name.equals(node.getClassName())) {
+                return node;
+            }
+            node.recycle();
+        } else {
+            for (int i = 0; i < node.getChildCount(); i++) {
+                if (node.getChild(i) != null) {
+                    AccessibilityNodeInfo ret = findOneNodeByClass(node.getChild(i), name);
+                    if (ret != null) {
+                        return ret;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private void clickVideoChat() {
+        // 找到视频聊天
+        AccessibilityNodeInfo node;
+        if (isVideoChat) {
+            node = findNodeByName(getRootInActiveWindow(), "视频聊天");
+        } else {
+            node = findNodeByName(getRootInActiveWindow(), "语音聊天");
+        }
+        if (node != null) {
+            Log.d(TAG, "step 3 finish");
+            clickNodeAndParent(node);
+            currentStep++;
+            name = null;
+            Log.d(TAG, "stop service");
+            node.recycle();
+            stopSelf();
         }
     }
 
@@ -149,7 +248,9 @@ public class MyAccessibility extends AccessibilityService {
                 parent.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                 break;
             }
+            AccessibilityNodeInfo temp = parent;
             parent = parent.getParent();
+            temp.recycle();
         }
     }
 
@@ -166,6 +267,7 @@ public class MyAccessibility extends AccessibilityService {
                 if (description.contains(name)) {
                     return node;
                 }
+                node.recycle();
             }
         } else {
             for (int i = 0; i < node.getChildCount(); i++) {
@@ -194,6 +296,7 @@ public class MyAccessibility extends AccessibilityService {
                 if (name.equals(node.getText().toString())) {
                     return node;
                 }
+                node.recycle();
             }
         } else {
             for (int i = 0; i < node.getChildCount(); i++) {
