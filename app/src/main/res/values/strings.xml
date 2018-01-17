@@ -8,4 +8,6 @@
         通过设置完成，下次进入App会直接显示“一键微信电话”按钮。这个我特意放大了字体，应该非常非常明显了。\n
         PS：MIUI上发现开启了无障碍在App结束后会收回权限，导致功能不能用。解决方法是打开自启动权限......我能怎么办？我也很无奈啊。
     </string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>
