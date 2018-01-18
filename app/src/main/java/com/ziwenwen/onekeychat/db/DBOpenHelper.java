@@ -35,12 +35,14 @@ public class DBOpenHelper extends SQLiteOpenHelper {
                 "("
                         + "%s INTEGER PRIMARY KEY, " // id, download id
                         + "%s VARCHAR, " // name
-                        + "%s INTEGER, " // url
-                        + "%s INTEGER, " // path
+                        + "%s VARCHAR, " // IMAGE
+                        + "%s INTEGER, " // group chat
+                        + "%s INTEGER, " // video chat
                         + "%s INTEGER " // create time
                         + ")"
                 , TaskEntity.ID
                 , TaskEntity.NAME
+                , TaskEntity.IMAGE
                 , TaskEntity.IS_GROUP_CHAT
                 , TaskEntity.IS_VIDOP_CHAT
                 , TaskEntity.CREATE_TIME

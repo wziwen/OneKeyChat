@@ -37,6 +37,7 @@ public class DBController {
                 TaskEntity model = new TaskEntity();
                 model.setId(c.getLong(c.getColumnIndex(TaskEntity.ID)));
                 model.setName(c.getString(c.getColumnIndex(TaskEntity.NAME)));
+                model.setImage(c.getString(c.getColumnIndex(TaskEntity.IMAGE)));
                 model.setIsVideoChat(c.getInt(c.getColumnIndex(TaskEntity.IS_VIDOP_CHAT)));
                 model.setIsGroupChat(c.getInt(c.getColumnIndex(TaskEntity.IS_GROUP_CHAT)));
                 model.setCreatetime(c.getLong(c.getColumnIndex(TaskEntity.CREATE_TIME)));

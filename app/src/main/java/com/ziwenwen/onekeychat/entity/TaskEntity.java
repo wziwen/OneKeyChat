@@ -8,6 +8,7 @@ import android.content.ContentValues;
 public class TaskEntity {
     public final static String ID = "id";
     public final static String NAME = "name";
+    public final static String IMAGE = "image";
     public final static String IS_VIDOP_CHAT = "isVideoChat";
     public final static String IS_GROUP_CHAT = "isGroupChat";
     public final static String CREATE_TIME = "createtime";
@@ -18,6 +19,7 @@ public class TaskEntity {
     private Integer isVideoChat;
     private Integer isGroupChat;
     private long createtime;
+    private String image;
 
     public Long getId() {
         return id;
@@ -63,9 +65,18 @@ public class TaskEntity {
         ContentValues cv = new ContentValues();
         cv.put(ID, id);
         cv.put(NAME, name);
+        cv.put(IMAGE, image);
         cv.put(IS_VIDOP_CHAT, isVideoChat);
         cv.put(IS_GROUP_CHAT, isGroupChat);
         cv.put(CREATE_TIME, createtime);
         return cv;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }
