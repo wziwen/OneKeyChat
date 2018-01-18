@@ -29,10 +29,9 @@ public class DBController {
 
         final List<TaskEntity> list = new ArrayList<>();
         try {
-            if (!c.moveToLast()) {
+            if (!c.moveToNext()) {
                 return list;
             }
-
             do {
                 TaskEntity model = new TaskEntity();
                 model.setId(c.getLong(c.getColumnIndex(TaskEntity.ID)));
@@ -42,7 +41,7 @@ public class DBController {
                 model.setIsGroupChat(c.getInt(c.getColumnIndex(TaskEntity.IS_GROUP_CHAT)));
                 model.setCreatetime(c.getLong(c.getColumnIndex(TaskEntity.CREATE_TIME)));
                 list.add(model);
-            } while (c.moveToPrevious());
+            } while (c.moveToNext());
         } finally {
             if (c != null) {
                 c.close();
