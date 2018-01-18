@@ -2,10 +2,12 @@ package com.ziwenwen.onekeychat.entity;
 
 import android.content.ContentValues;
 
+import java.io.Serializable;
+
 /**
  * Created by ziwen.wen on 2018/1/17.
  */
-public class TaskEntity {
+public class TaskEntity implements Serializable {
     public final static String ID = "id";
     public final static String NAME = "name";
     public final static String IMAGE = "image";
@@ -16,10 +18,10 @@ public class TaskEntity {
 
     private Long id;
     private String name;
-    private Integer isVideoChat;
-    private Integer isGroupChat;
-    private long createtime;
+    private int isVideoChat;
+    private int isGroupChat;
     private String image;
+    private long createtime;
 
     public Long getId() {
         return id;
@@ -45,19 +47,19 @@ public class TaskEntity {
         this.createtime = createtime;
     }
 
-    public Integer getIsVideoChat() {
+    public int getIsVideoChat() {
         return isVideoChat;
     }
 
-    public void setIsVideoChat(Integer isVideoChat) {
+    public void setIsVideoChat(int isVideoChat) {
         this.isVideoChat = isVideoChat;
     }
 
-    public Integer getIsGroupChat() {
+    public int getIsGroupChat() {
         return isGroupChat;
     }
 
-    public void setIsGroupChat(Integer isGroupChat) {
+    public void setIsGroupChat(int isGroupChat) {
         this.isGroupChat = isGroupChat;
     }
 

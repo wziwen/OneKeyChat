@@ -25,7 +25,7 @@ public class DBController {
     }
 
     public List<TaskEntity> getAllTasks() {
-        final Cursor c = db.rawQuery("SELECT * FROM " + TASK_TABLE_NAME + " order by " + TaskEntity.CREATE_TIME, null);
+        final Cursor c = db.rawQuery("SELECT * FROM " + TASK_TABLE_NAME + " order by " + TaskEntity.CREATE_TIME + " ASC", null);
 
         final List<TaskEntity> list = new ArrayList<>();
         try {
@@ -81,4 +81,15 @@ public class DBController {
     }
 
 
+    public boolean insertOrUpdate(TaskEntity taskEntity) {
+        if (taskEntity.getCreatetime() == 0) {
+            taskEntity.setCreatetime(System.currentTimeMillis());
+        }
+        long id = db.insertWithOnConflict(TASK_TABLE_NAME, null, taskEntity.toContentValues(), SQLiteDatabase.CONFLICT_REPLACE);
+        if (id != -1) {
+            taskEntity.setId(id);
+            return true;
+        }
+        return false;
+    }
 }

@@ -3,6 +3,8 @@
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".App"
@@ -19,6 +21,16 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity"/>
+        <activity android:name=".EditTaskActivity"/>
+        <activity
+        android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
+        android:exported="true"
+        android:theme="@style/AppTheme.NoTitle"
+        android:screenOrientation="portrait" />
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:theme="@style/AppTheme.NoTitle"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".MyAccessibility"

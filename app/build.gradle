@@ -42,4 +42,7 @@ dependencies {
         exclude group: "com.android.support"
     })
     compile 'com.android.support:appcompat-v7:26.1.0'
+    def SUPPORT_LIB_VERSION = "26.1.0"
+    compile "com.android.support:recyclerview-v7:$SUPPORT_LIB_VERSION"
+    compile "com.android.support:exifinterface:$SUPPORT_LIB_VERSION"
 }
