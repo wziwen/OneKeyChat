@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DBController {
-    public final static String TASK_TABLE_NAME = "taks";
+    public final static String TASK_TABLE_NAME = "task";
     private final SQLiteDatabase db;
 
     private static DBController instance = new DBController();
@@ -29,10 +29,7 @@ public class DBController {
 
         final List<TaskEntity> list = new ArrayList<>();
         try {
-            if (!c.moveToNext()) {
-                return list;
-            }
-            do {
+            while (c.moveToNext()) {
                 TaskEntity model = new TaskEntity();
                 model.setId(c.getLong(c.getColumnIndex(TaskEntity.ID)));
                 model.setName(c.getString(c.getColumnIndex(TaskEntity.NAME)));
@@ -41,7 +38,7 @@ public class DBController {
                 model.setIsGroupChat(c.getInt(c.getColumnIndex(TaskEntity.IS_GROUP_CHAT)));
                 model.setCreatetime(c.getLong(c.getColumnIndex(TaskEntity.CREATE_TIME)));
                 list.add(model);
-            } while (c.moveToNext());
+            }
         } finally {
             if (c != null) {
                 c.close();
