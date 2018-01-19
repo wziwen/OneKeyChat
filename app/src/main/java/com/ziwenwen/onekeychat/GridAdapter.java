@@ -51,7 +51,7 @@ public class GridAdapter extends ArrayAdapter<TaskEntity> {
         public void bind(int position, TaskEntity item) {
             Glide.with(itemView.getContext())
                     .load(item.getImage())
-                    .placeholder(R.mipmap.ic_launcher)
+                    .placeholder(R.mipmap.image)
                     .into(imageView);
             if (TextUtils.isEmpty(item.getName())) {
                 tvName.setText("");

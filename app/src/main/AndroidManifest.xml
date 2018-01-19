@@ -21,7 +21,6 @@
                 <!-- <action android:name="android.intent.action.CREATE_SHORTCUT" /> -->
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"/>
         <activity android:name=".EditTaskActivity"/>
         <activity
         android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"

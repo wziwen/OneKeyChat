@@ -189,7 +189,7 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
         shortcut.putExtra(Intent.EXTRA_SHORTCUT_NAME, taskEntity.getName());
 
         Parcelable icon = Intent.ShortcutIconResource.fromContext(
-                getApplicationContext(), R.mipmap.ic_launcher);
+                getApplicationContext(), R.mipmap.image);
         shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
         if (!TextUtils.isEmpty(taskEntity.getImage())) {
             Bitmap bitmap = BitmapUtils.getImageFromPath(taskEntity.getImage(), 144,144);
