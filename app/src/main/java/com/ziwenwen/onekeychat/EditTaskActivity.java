@@ -1,5 +1,6 @@
 package com.ziwenwen.onekeychat;
 
+import android.appwidget.AppWidgetManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,7 +10,6 @@ import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -17,11 +17,11 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.ziwenwen.onekeychat.entity.TaskEntity;
+import com.ziwenwen.onekeychat.widget.OneAppWidget;
 
 import cn.finalteam.rxgalleryfinal.RxGalleryFinal;
 import cn.finalteam.rxgalleryfinal.imageloader.ImageLoaderType;
 import cn.finalteam.rxgalleryfinal.rxbus.RxBusResultDisposable;
-import cn.finalteam.rxgalleryfinal.rxbus.event.ImageMultipleResultEvent;
 import cn.finalteam.rxgalleryfinal.rxbus.event.ImageRadioResultEvent;
 
 public class EditTaskActivity extends AppCompatActivity implements View.OnClickListener {
@@ -86,6 +86,8 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
         TaskManager.getInstance()
                 .insertOrUpdate(taskEntity);
         setResult(RESULT_OK);
+
+        OneAppWidget.updateWidget(this, AppWidgetManager.getInstance(this));
         finish();
     }
 
