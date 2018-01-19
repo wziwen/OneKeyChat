@@ -45,4 +45,5 @@ dependencies {
     def SUPPORT_LIB_VERSION = "26.1.0"
     compile "com.android.support:recyclerview-v7:$SUPPORT_LIB_VERSION"
     compile "com.android.support:exifinterface:$SUPPORT_LIB_VERSION"
+    compile 'com.tencent.bugly:crashreport:2.6.6'
 }
