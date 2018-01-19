@@ -8,10 +8,10 @@ import java.util.List;
 /**
  * Created by ziwen.wen on 2018/1/18.
  */
-class TaskManager {
+public class TaskManager {
     private static final TaskManager ourInstance = new TaskManager();
 
-    static TaskManager getInstance() {
+    public static TaskManager getInstance() {
         return ourInstance;
     }
 
@@ -22,6 +22,10 @@ class TaskManager {
     private TaskManager() {
         dbController = DBController.instance();
         allTasks = dbController.getAllTasks();
+    }
+
+    public List<TaskEntity> getAllTasks() {
+        return allTasks;
     }
 
     public void insertOrUpdate(TaskEntity taskEntity) {
