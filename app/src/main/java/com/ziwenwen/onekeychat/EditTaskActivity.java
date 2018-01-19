@@ -3,6 +3,7 @@ package com.ziwenwen.onekeychat;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.ziwenwen.onekeychat.entity.TaskEntity;
+import com.ziwenwen.onekeychat.utils.BitmapUtils;
 import com.ziwenwen.onekeychat.utils.OpenHelper;
 import com.ziwenwen.onekeychat.widget.OneAppWidget;
 
@@ -189,6 +191,12 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
         Parcelable icon = Intent.ShortcutIconResource.fromContext(
                 getApplicationContext(), R.mipmap.ic_launcher);
         shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
+        if (!TextUtils.isEmpty(taskEntity.getImage())) {
+            Bitmap bitmap = BitmapUtils.getImageFromPath(taskEntity.getImage(), 144,144);
+            if (bitmap != null) {
+                shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON, bitmap);
+            }
+        }
         shortcut.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
         context.sendBroadcast(shortcut);
     }
