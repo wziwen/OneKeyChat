@@ -15,11 +15,11 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.RemoteViews;
 
-import com.ziwenwen.onekeychat.BitmapUtils;
-import com.ziwenwen.onekeychat.MainActivity;
+import com.ziwenwen.onekeychat.ListActivity;
 import com.ziwenwen.onekeychat.R;
 import com.ziwenwen.onekeychat.TaskManager;
 import com.ziwenwen.onekeychat.entity.TaskEntity;
+import com.ziwenwen.onekeychat.utils.BitmapUtils;
 
 import java.util.List;
 
@@ -55,8 +55,8 @@ public class OneAppWidget extends AppWidgetProvider {
                     remoteViews.setImageViewBitmap(IMG_RES, bitmap);
                 }
             }
-            Intent configIntent = new Intent(context, MainActivity.class);
-            configIntent.putExtra("task", entity);
+            Intent configIntent = new Intent(context, ListActivity.class);
+            entity.saveToIntent(configIntent);
             PendingIntent configPendingIntent = PendingIntent.getActivity(context, 0, configIntent, 0);
 
             remoteViews.setViewVisibility(WIDGET_RES, View.VISIBLE);

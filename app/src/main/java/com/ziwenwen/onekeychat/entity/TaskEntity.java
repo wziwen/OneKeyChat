@@ -1,6 +1,8 @@
 package com.ziwenwen.onekeychat.entity;
 
 import android.content.ContentValues;
+import android.content.Intent;
+import android.os.Bundle;
 
 import java.io.Serializable;
 
@@ -80,5 +82,20 @@ public class TaskEntity implements Serializable {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public void saveToIntent(Intent intent) {
+        Bundle bundle = new Bundle();
+        bundle.putString("name", name);
+        bundle.putBoolean("isVideoChat", isVideoChat == 1);
+        bundle.putBoolean("isGroupChat", isGroupChat == 1);
+        intent.putExtras(bundle);
+    }
+
+    public void loadFromIntent(Intent intent) {
+        Bundle bundle = intent.getExtras();
+        name = bundle.getString("name");
+        isVideoChat = bundle.getBoolean("isVideoChat") ? 0 : 1;
+        isGroupChat = bundle.getBoolean("isGroupChat") ? 0 : 1;
     }
 }

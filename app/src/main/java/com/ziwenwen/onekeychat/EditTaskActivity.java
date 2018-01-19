@@ -1,8 +1,6 @@
 package com.ziwenwen.onekeychat;
 
 import android.appwidget.AppWidgetManager;
-import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +15,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.ziwenwen.onekeychat.entity.TaskEntity;
+import com.ziwenwen.onekeychat.utils.OpenHelper;
 import com.ziwenwen.onekeychat.widget.OneAppWidget;
 
 import cn.finalteam.rxgalleryfinal.RxGalleryFinal;
@@ -32,7 +31,6 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
 
     TaskEntity taskEntity;
     private ImageView ivIcon;
-    private String imagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,30 +63,34 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void createShotCut() {
+        if (!validate()) {
+            return;
+        }
+        updateEntity();
         createShotCut(EditTaskActivity.this,
-                EditTaskActivity.class,
-                etName.getText().toString(),
-                cbVideoChat.isChecked(),
-                cbVideoChat.isChecked());
+                ListActivity.class, taskEntity);
     }
 
     private void onComplete() {
         if (!validate()) {
             return;
         }
-        if (taskEntity == null) {
-            taskEntity = new TaskEntity();
-        }
-        taskEntity.setName(etName.getText().toString());
-        taskEntity.setIsGroupChat(cbGroupChat.isChecked() ? 1 : 0);
-        taskEntity.setIsVideoChat(cbVideoChat.isChecked() ? 1 : 0);
-        taskEntity.setImage(imagePath);
+        updateEntity();
         TaskManager.getInstance()
                 .insertOrUpdate(taskEntity);
         setResult(RESULT_OK);
 
         OneAppWidget.updateWidget(this, AppWidgetManager.getInstance(this));
         finish();
+    }
+
+    private void updateEntity() {
+        if (taskEntity == null) {
+            taskEntity = new TaskEntity();
+        }
+        taskEntity.setName(etName.getText().toString());
+        taskEntity.setIsGroupChat(cbGroupChat.isChecked() ? 1 : 0);
+        taskEntity.setIsVideoChat(cbVideoChat.isChecked() ? 1 : 0);
     }
 
     @Override
@@ -119,9 +121,12 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
                     @Override
                     protected void onEvent(ImageRadioResultEvent imageRadioResultEvent) throws Exception {
                         //图片选择结果
-                        String filePath = imageRadioResultEvent.getResult().getOriginalPath();
-                        imagePath = filePath;
+                        String imagePath = imageRadioResultEvent.getResult().getOriginalPath();
 
+                        if (taskEntity == null) {
+                            taskEntity = new TaskEntity();
+                        }
+                        taskEntity.setImage(imagePath);
                         Glide.with(EditTaskActivity.this)
                                 .load(imagePath)
                                 .into(ivIcon);
@@ -164,51 +169,22 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void oneKeyChat(String name, boolean isVideoChat, boolean isGroupChat) {
-        try {
-            // 启动监听
-            Intent intent = new Intent(EditTaskActivity.this, MyAccessibility.class);
-            intent.putExtra("name", name);
-            intent.putExtra("isVideoChat", isVideoChat);
-            intent.putExtra("isGroupChat", isGroupChat);
-            startService(intent);
-            // 打开微信首页
-            intent = new Intent();
-            ComponentName cmp = new ComponentName("com.tencent.mm", "com.tencent.mm.ui.LauncherUI");
-            intent.setAction(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_LAUNCHER);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.setComponent(cmp);
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            // 确保没有微信时不会崩溃
-            Toast.makeText(this, "请安装好微信", Toast.LENGTH_SHORT).show();
-        }
+        OpenHelper.oneKeyChat(this, name, isVideoChat, isGroupChat);
     }
 
-    public void createShotCut(Context context, Class<?> clazz, String name, boolean isVideoChat, boolean isGroupChat) {
-
+    public void createShotCut(Context context, Class<?> clazz, TaskEntity taskEntity) {
         Intent shortcutIntent = new Intent(Intent.ACTION_MAIN);
 
         shortcutIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         shortcutIntent.setClass(context, clazz);
-        /**
-         * 创建一个Bundle对象让其保存将要传递的值
-         */
-        Bundle bundle = new Bundle();
-        bundle.putString("name", name);
-        bundle.putBoolean("isVideoChat", isVideoChat);
-        bundle.putBoolean("isGroupChat", isGroupChat);
-        shortcutIntent.putExtras(bundle);
-        /**
-         * 设置这条属性，可以使点击快捷方式后关闭其他的任务栈的其他activity，然后创建指定的acticity
-         */
+
+        taskEntity.saveToIntent(shortcutIntent);
+        // 设置这条属性，可以使点击快捷方式后关闭其他的任务栈的其他activity，然后创建指定的acticity(强制打开微信首页)
         shortcutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         Intent shortcut = new Intent(Intent.ACTION_CREATE_SHORTCUT);
         shortcut.putExtra("duplicate", false);
         shortcut.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-        shortcut.putExtra(Intent.EXTRA_SHORTCUT_NAME, name);
+        shortcut.putExtra(Intent.EXTRA_SHORTCUT_NAME, taskEntity.getName());
 
         Parcelable icon = Intent.ShortcutIconResource.fromContext(
                 getApplicationContext(), R.mipmap.ic_launcher);

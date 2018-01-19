@@ -6,7 +6,7 @@
 
     <com.ziwenwen.onekeychat.view.SquareImageView
         android:id="@+id/image"
-        android:scaleType="center"
+        android:scaleType="fitXY"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.ziwenwen.onekeychat.entity.TaskEntity;
+import com.ziwenwen.onekeychat.utils.OpenHelper;
 
 /**
  * Created by ziwen.wen on 2018/1/18.
@@ -19,12 +21,22 @@ import com.ziwenwen.onekeychat.entity.TaskEntity;
 public class ListActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private static final int REQUEST_ADD_OR_MODIFY = 100;
+    private static final String TAG = "ListActivity";
     GridView gridView;
     GridAdapter gridAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getIntent().hasExtra("name")) {
+            TaskEntity taskEntity = new TaskEntity();
+            taskEntity.loadFromIntent(getIntent());
+            OpenHelper.oneKeyChat(this, taskEntity.getName(), taskEntity.getIsVideoChat() == 1, taskEntity.getIsVideoChat() == 1);
+            Log.d(TAG, "has task on onCreate, just finish");
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_list);
         gridView = findViewById(R.id.grid_view);
         gridAdapter = new GridAdapter(this);
@@ -32,6 +44,19 @@ public class ListActivity extends AppCompatActivity implements AdapterView.OnIte
         gridView.setAdapter(gridAdapter);
 
         gridView.setOnItemClickListener(this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d(TAG, "on new intent");
+        if (intent.hasExtra("name")) {
+            TaskEntity taskEntity = new TaskEntity();
+            taskEntity.loadFromIntent(intent);
+            OpenHelper.oneKeyChat(this, taskEntity.getName(), taskEntity.getIsVideoChat() == 1, taskEntity.getIsVideoChat() == 1);
+            finish();
+            moveTaskToBack(true);
+        }
     }
 
     @Override

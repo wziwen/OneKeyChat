@@ -1,4 +1,4 @@
-package com.ziwenwen.onekeychat;
+package com.ziwenwen.onekeychat.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
