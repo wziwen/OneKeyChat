@@ -58,14 +58,20 @@ public class ListActivity extends AppCompatActivity implements AdapterView.OnIte
     private void oneKeyChat(Intent intent) {
         String type = getIntent().getStringExtra("type");
         if ("type_shot_cut".equals(type)) {
-            StatService.trackCustomKVEvent(this, "make_call_shot_cut", null);
+            trackEvent("make_call_shot_cut");
         } else {
-            StatService.trackCustomKVEvent(this, "make_call_app_widget", null);
+            trackEvent("make_call_app_widget");
         }
 
         TaskEntity taskEntity = new TaskEntity();
         taskEntity.loadFromIntent(intent);
         OpenHelper.oneKeyChat(this, taskEntity.getName(), taskEntity.getIsVideoChat() == 1, taskEntity.getIsVideoChat() == 1);
+    }
+
+    private void trackEvent(String event) {
+        if (!BuildConfig.DEBUG) {
+            StatService.trackCustomKVEvent(this, event, null);
+        }
     }
 
     @Override
@@ -78,7 +84,7 @@ public class ListActivity extends AppCompatActivity implements AdapterView.OnIte
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_add) {
             Intent intent = new Intent(this, EditTaskActivity.class);
-            StatService.trackCustomKVEvent(this, "create_task", null);
+            trackEvent("create_task");
             startActivityForResult(intent, REQUEST_ADD_OR_MODIFY);
         } else if (item.getItemId() == R.id.menu_open_setting) {
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
