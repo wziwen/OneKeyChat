@@ -10,6 +10,7 @@ import java.io.IOException;
 
 /**
  * Created by ziwen.wen on 2018/1/19.
+ * BitmapUtils
  */
 public class BitmapUtils {
 
@@ -56,7 +57,7 @@ public class BitmapUtils {
         }
     }
 
-    public static int readPictureDegree(String path) {
+    private static int readPictureDegree(String path) {
         int degree = 0;
         try {
             ExifInterface exifInterface = new ExifInterface(path);
@@ -80,13 +81,12 @@ public class BitmapUtils {
         return degree;
     }
 
-    public static Bitmap rotaingImageView(int angle, Bitmap bitmap) {
+    private static Bitmap rotaingImageView(int angle, Bitmap bitmap) {
         //旋转图片 动作
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
         // 创建新的图片
-        Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
+        return Bitmap.createBitmap(bitmap, 0, 0,
                 bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-        return resizedBitmap;
     }
 }

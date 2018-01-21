@@ -10,6 +10,7 @@ import com.ziwenwen.onekeychat.WeixinCallAS;
 
 /**
  * Created by ziwen.wen on 2018/1/19.
+ * OpenHelper
  */
 public class OpenHelper {
     public static void oneKeyChat(Activity activity, String name, boolean isVideoChat, boolean isGroupChat) {

@@ -229,8 +229,6 @@ public class WeixinCallAS extends AccessibilityService {
 
     /**
      * 点击控件和对应的父控件
-     *
-     * @param node
      */
     private void clickNodeAndParent(AccessibilityNodeInfo node) {
         node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
@@ -276,10 +274,6 @@ public class WeixinCallAS extends AccessibilityService {
 
     /**
      * 根据节点名称找到对应控件. 如果有多个只会返回最先找到的一个
-     *
-     * @param node
-     * @param name
-     * @return
      */
     public AccessibilityNodeInfo findNodeByName(AccessibilityNodeInfo node, String name) {
         if (node.getChildCount() == 0) {

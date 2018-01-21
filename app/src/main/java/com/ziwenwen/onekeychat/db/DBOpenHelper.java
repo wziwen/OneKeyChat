@@ -8,10 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.ziwenwen.onekeychat.entity.TaskEntity;
 
 public class DBOpenHelper extends SQLiteOpenHelper {
-    public final static String DATABASE_NAME = "on_key.db";
-    public final static int DATABASE_VERSION = 1;
+    private final static String DATABASE_NAME = "on_key.db";
+    private final static int DATABASE_VERSION = 1;
 
-    public DBOpenHelper(Context context) {
+    DBOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

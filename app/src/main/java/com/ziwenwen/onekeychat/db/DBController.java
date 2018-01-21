@@ -48,24 +48,6 @@ public class DBController {
         return list;
     }
 
-    public TaskEntity addTask(String name,
-                              int isVideoChat,
-                              int isGroupChat) {
-        TaskEntity model = new TaskEntity();
-        model.setName(name);
-        model.setIsVideoChat(isVideoChat);
-        model.setIsGroupChat(isGroupChat);
-        model.setCreatetime(System.currentTimeMillis());
-
-        long id = db.insert(TASK_TABLE_NAME, null, model.toContentValues());
-        if (id != -1) {
-            model.setId(id);
-            return model;
-        }
-        return null;
-    }
-
-
     public boolean clearAllTask() {
         try {
             db.delete(TASK_TABLE_NAME, null, null);

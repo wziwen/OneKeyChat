@@ -9,6 +9,7 @@ import com.tencent.stat.StatService;
 
 /**
  * Created by ziwen.wen on 2018/1/17.
+ * Application
  */
 public class App extends Application {
 

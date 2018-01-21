@@ -8,6 +8,7 @@ import java.io.Serializable;
 
 /**
  * Created by ziwen.wen on 2018/1/17.
+ * TaskEntity
  */
 public class TaskEntity implements Serializable {
     public final static String ID = "id";
@@ -94,6 +95,9 @@ public class TaskEntity implements Serializable {
 
     public void loadFromIntent(Intent intent) {
         Bundle bundle = intent.getExtras();
+        if(bundle == null) {
+            return;
+        }
         name = bundle.getString("name");
         isVideoChat = bundle.getBoolean("isVideoChat") ? 0 : 1;
         isGroupChat = bundle.getBoolean("isGroupChat") ? 0 : 1;
