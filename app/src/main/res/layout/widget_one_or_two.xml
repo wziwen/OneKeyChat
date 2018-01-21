@@ -19,6 +19,11 @@
         android:layout_alignBottom="@+id/image_one"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="8dp"
+        android:shadowColor="@color/black"
+        android:textColor="@color/white"
+        android:shadowDx="1.0"
+        android:shadowDy="1.0"
+        android:shadowRadius="2.0"
         android:singleLine="true"
         android:textSize="14sp"/>
 
