@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.tencent.stat.StatService;
 import com.ziwenwen.onekeychat.entity.TaskEntity;
 import com.ziwenwen.onekeychat.utils.OpenHelper;
 
@@ -29,9 +30,7 @@ public class ListActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getIntent().hasExtra("name")) {
-            TaskEntity taskEntity = new TaskEntity();
-            taskEntity.loadFromIntent(getIntent());
-            OpenHelper.oneKeyChat(this, taskEntity.getName(), taskEntity.getIsVideoChat() == 1, taskEntity.getIsVideoChat() == 1);
+            oneKeyChat(getIntent());
             Log.d(TAG, "has task on onCreate, just finish");
             finish();
             return;
@@ -51,12 +50,22 @@ public class ListActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onNewIntent(intent);
         Log.d(TAG, "on new intent");
         if (intent.hasExtra("name")) {
-            TaskEntity taskEntity = new TaskEntity();
-            taskEntity.loadFromIntent(intent);
-            OpenHelper.oneKeyChat(this, taskEntity.getName(), taskEntity.getIsVideoChat() == 1, taskEntity.getIsVideoChat() == 1);
-            finish();
+            oneKeyChat(intent);
             moveTaskToBack(true);
         }
+    }
+
+    private void oneKeyChat(Intent intent) {
+        String type = getIntent().getStringExtra("type");
+        if ("type_shot_cut".equals(type)) {
+            StatService.trackCustomKVEvent(this, "make_call_shot_cut", null);
+        } else {
+            StatService.trackCustomKVEvent(this, "make_call_app_widget", null);
+        }
+
+        TaskEntity taskEntity = new TaskEntity();
+        taskEntity.loadFromIntent(intent);
+        OpenHelper.oneKeyChat(this, taskEntity.getName(), taskEntity.getIsVideoChat() == 1, taskEntity.getIsVideoChat() == 1);
     }
 
     @Override
@@ -69,6 +78,7 @@ public class ListActivity extends AppCompatActivity implements AdapterView.OnIte
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_add) {
             Intent intent = new Intent(this, EditTaskActivity.class);
+            StatService.trackCustomKVEvent(this, "create_task", null);
             startActivityForResult(intent, REQUEST_ADD_OR_MODIFY);
         } else if (item.getItemId() == R.id.menu_open_setting) {
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
@@ -94,6 +104,7 @@ public class ListActivity extends AppCompatActivity implements AdapterView.OnIte
         TaskEntity entity = gridAdapter.getItem(position);
         Intent intent = new Intent(this, EditTaskActivity.class);
         intent.putExtra("task", entity);
+        StatService.trackCustomKVEvent(this, "task_detail", null);
         startActivityForResult(intent, REQUEST_ADD_OR_MODIFY);
     }
 }

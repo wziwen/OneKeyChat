@@ -10,6 +10,11 @@ android {
         versionCode 3
         versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders = [
+                MTA_APPKEY:"AY1T3HU3R4RM",
+                MTA_CHANNEL:"wen"
+        ]
     }
     buildTypes {
         release {
@@ -46,4 +51,7 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$SUPPORT_LIB_VERSION"
     compile "com.android.support:exifinterface:$SUPPORT_LIB_VERSION"
     compile 'com.tencent.bugly:crashreport:2.6.6'
+    //mta 3.2 稳定版
+    compile 'com.qq.mta:mta:3.3.1-release'
+    compile 'com.tencent.mid:mid:3.73-release'
 }
