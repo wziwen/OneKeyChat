@@ -7,13 +7,14 @@ import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.CheckBox;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyAccessibility extends AccessibilityService {
+public class WeixinCallAS extends AccessibilityService {
 
-    private static final String TAG = "MyAccessibility";
+    private static final String TAG = "WeixinCallAS";
     private static final int MAX_WATCH_TIME = 5 * 60 * 1000; // 避免一直监听, 如果超过时间就不再解析
     private String name;
     private boolean isVideoChat;
@@ -21,15 +22,19 @@ public class MyAccessibility extends AccessibilityService {
     int currentStep =  -1;
     long taskStartTime = 0;
 
-    public static MyAccessibility instance;
+    private boolean hasPermission = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        instance = this;
         Log.d(TAG, "on create");
     }
 
+    @Override
+    protected void onServiceConnected() {
+        super.onServiceConnected();
+        hasPermission = true;
+    }
 
     @Override
     public void onInterrupt() {
@@ -38,6 +43,13 @@ public class MyAccessibility extends AccessibilityService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (!hasPermission) {
+            Toast.makeText(this, "无障碍权限没有开启", Toast.LENGTH_SHORT).show();
+        } else {
+            if (BuildConfig.DEBUG) {
+                Toast.makeText(this, "权限开启", Toast.LENGTH_SHORT).show();
+            }
+        }
         if (intent != null) {
             taskStartTime = System.currentTimeMillis();
             currentStep = 0;
@@ -52,7 +64,6 @@ public class MyAccessibility extends AccessibilityService {
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
-        instance = null;
         super.onDestroy();
     }
 

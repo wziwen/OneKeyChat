@@ -6,8 +6,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.widget.Toast;
 
-import com.ziwenwen.onekeychat.EditTaskActivity;
-import com.ziwenwen.onekeychat.MyAccessibility;
+import com.ziwenwen.onekeychat.WeixinCallAS;
 
 /**
  * Created by ziwen.wen on 2018/1/19.
@@ -16,14 +15,10 @@ public class OpenHelper {
     public static void oneKeyChat(Activity activity, String name, boolean isVideoChat, boolean isGroupChat) {
         try {
             // 启动监听
-            Intent intent = new Intent(activity, MyAccessibility.class);
+            Intent intent = new Intent(activity, WeixinCallAS.class);
             intent.putExtra("name", name);
             intent.putExtra("isVideoChat", isVideoChat);
             intent.putExtra("isGroupChat", isGroupChat);
-            if (MyAccessibility.instance == null) {
-                Toast.makeText(activity, "障碍模式未开启", Toast.LENGTH_SHORT).show();
-                return;
-            }
             activity.startService(intent);
             // 打开微信首页
             intent = new Intent();
