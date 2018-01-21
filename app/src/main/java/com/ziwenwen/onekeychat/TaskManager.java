@@ -33,4 +33,8 @@ public class TaskManager {
             allTasks = dbController.getAllTasks();
         }
     }
+
+    public boolean deleteTask(long id) {
+        return dbController.deleteTask(id);
+    }
 }

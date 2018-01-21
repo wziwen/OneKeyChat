@@ -2,10 +2,12 @@ package com.ziwenwen.onekeychat;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
@@ -24,6 +26,12 @@ import cn.finalteam.rxgalleryfinal.RxGalleryFinal;
 import cn.finalteam.rxgalleryfinal.imageloader.ImageLoaderType;
 import cn.finalteam.rxgalleryfinal.rxbus.RxBusResultDisposable;
 import cn.finalteam.rxgalleryfinal.rxbus.event.ImageRadioResultEvent;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class EditTaskActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -39,8 +47,16 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_task);
 
+        View btnDelete = findViewById(R.id.btn_delete);
         if (getIntent().hasExtra("task")) {
             taskEntity = (TaskEntity) getIntent().getSerializableExtra("task");
+            btnDelete.setVisibility(View.VISIBLE);
+            btnDelete.setOnClickListener(this);
+        } else {
+            btnDelete.setVisibility(View.GONE);
+        }
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
         etName = findViewById(R.id.et_name);
@@ -107,10 +123,50 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
             case R.id.btn_create_shortcut:
                 createShotCut();
                 break;
+            case R.id.btn_delete:
+                deleteTask();
+                break;
             case R.id.iv_icon:
                 selectImage();
                 break;
         }
+    }
+
+    private void deleteTask() {
+        new AlertDialog.Builder(this)
+                .setTitle("提醒")
+                .setMessage("删除后无法恢复, 确定删除？")
+                .setNeutralButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 清空数据库
+                       if (taskEntity != null && taskEntity.getId() != null) {
+                           boolean ret = TaskManager.getInstance()
+                                   .deleteTask(taskEntity.getId());
+                           if (ret) {
+                               Toast.makeText(EditTaskActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
+                               for (TaskEntity entity : TaskManager.getInstance().getAllTasks()) {
+                                   if (entity.getId().equals(taskEntity.getId())) {
+                                       TaskManager.getInstance().getAllTasks().remove(entity);
+                                   }
+                               }
+                               setResult(RESULT_OK);
+                               finish();
+                           } else {
+                               Toast.makeText(EditTaskActivity.this, "删除失败", Toast.LENGTH_SHORT).show();
+                           }
+                       } else {
+                           Toast.makeText(EditTaskActivity.this, "删除失败", Toast.LENGTH_SHORT).show();
+                       }
+                    }
+                })
+                .show();
     }
 
     private void selectImage() {
@@ -189,7 +245,7 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
         shortcut.putExtra(Intent.EXTRA_SHORTCUT_NAME, taskEntity.getName());
 
         Parcelable icon = Intent.ShortcutIconResource.fromContext(
-                getApplicationContext(), R.mipmap.image);
+                getApplicationContext(), R.color.widget_bg);
         shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
         if (!TextUtils.isEmpty(taskEntity.getImage())) {
             Bitmap bitmap = BitmapUtils.getImageFromPath(taskEntity.getImage(), 144,144);

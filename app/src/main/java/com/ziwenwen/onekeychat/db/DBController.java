@@ -58,6 +58,15 @@ public class DBController {
         return false;
     }
 
+    public boolean deleteTask(long id) {
+        try {
+            return 0 != db.delete(TASK_TABLE_NAME, "id=" + id, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
     public boolean insertOrUpdate(TaskEntity taskEntity) {
         if (taskEntity.getCreatetime() == 0) {

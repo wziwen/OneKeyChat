@@ -129,26 +129,36 @@
                 </RelativeLayout>
 
 
-                <Button
-                    android:id="@+id/btn_test"
-                    android:text="测试"
-                    android:layout_marginTop="8dp"
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_margin="8dp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content">
 
-                <Button
-                    android:id="@+id/btn_create_shortcut"
-                    android:text="创建快捷方式"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    <Button
+                        android:id="@+id/btn_test"
+                        android:text="测试"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
 
-                <Button
-                    android:id="@+id/btn_complete"
-                    android:text="设置完成"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    <Button
+                        android:id="@+id/btn_create_shortcut"
+                        android:text="创建快捷方式"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <Button
+                        android:id="@+id/btn_complete"
+                        android:text="设置完成"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <Button
+                        android:id="@+id/btn_delete"
+                        android:text="删除"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
 
             </LinearLayout>
         </LinearLayout>
