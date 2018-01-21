@@ -14,10 +14,22 @@ import java.util.List;
 public class MyAccessibility extends AccessibilityService {
 
     private static final String TAG = "MyAccessibility";
+    private static final int MAX_WATCH_TIME = 5 * 60 * 1000; // 避免一直监听, 如果超过时间就不再解析
     private String name;
     private boolean isVideoChat;
     private boolean isGroupChat;
     int currentStep =  -1;
+    long taskStartTime = 0;
+
+    public static MyAccessibility instance;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        instance = this;
+        Log.d(TAG, "on create");
+    }
+
 
     @Override
     public void onInterrupt() {
@@ -27,6 +39,7 @@ public class MyAccessibility extends AccessibilityService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
+            taskStartTime = System.currentTimeMillis();
             currentStep = 0;
             name = intent.getStringExtra("name");
             isVideoChat = intent.getBooleanExtra("isVideoChat", false);
@@ -39,6 +52,7 @@ public class MyAccessibility extends AccessibilityService {
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
+        instance = null;
         super.onDestroy();
     }
 
@@ -50,6 +64,13 @@ public class MyAccessibility extends AccessibilityService {
             Log.d(TAG, "name is empty, disable");
             return;
         }
+        disable = taskStartTime + MAX_WATCH_TIME < System.currentTimeMillis();
+        if (disable) {
+            Log.d(TAG, "time over, disable");
+            return;
+        }
+
+
         Log.d(TAG, "onAccessibilityEvent: " + event.toString());
         String className = event.getClassName().toString();
         Log.d(TAG, "onAccessibilityEvent class: " + className);

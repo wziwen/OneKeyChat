@@ -39,8 +39,7 @@
 
         <service
             android:name=".MyAccessibility"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:process=":accessibility">
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService"/>
             </intent-filter>

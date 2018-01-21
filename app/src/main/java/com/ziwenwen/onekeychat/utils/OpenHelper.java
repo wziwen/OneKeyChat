@@ -20,6 +20,10 @@ public class OpenHelper {
             intent.putExtra("name", name);
             intent.putExtra("isVideoChat", isVideoChat);
             intent.putExtra("isGroupChat", isGroupChat);
+            if (MyAccessibility.instance == null) {
+                Toast.makeText(activity, "障碍模式未开启", Toast.LENGTH_SHORT).show();
+                return;
+            }
             activity.startService(intent);
             // 打开微信首页
             intent = new Intent();
