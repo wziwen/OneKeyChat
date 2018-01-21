@@ -70,7 +70,14 @@ public class MyAccessibility extends AccessibilityService {
             return;
         }
 
+        try {
+            doTask(event);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    private void doTask(AccessibilityEvent event) {
         Log.d(TAG, "onAccessibilityEvent: " + event.toString());
         String className = event.getClassName().toString();
         Log.d(TAG, "onAccessibilityEvent class: " + className);
