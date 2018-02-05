@@ -1,9 +1,12 @@
 package com.ziwenwen.onekeychat;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -43,6 +46,36 @@ public class ListActivity extends AppCompatActivity implements AdapterView.OnIte
         gridView.setAdapter(gridAdapter);
 
         gridView.setOnItemClickListener(this);
+
+        checkIfShowIntro();
+    }
+
+    private static final String KEY_FIRST_TIME_IN = "first_time_in";
+    private void checkIfShowIntro() {
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+
+        boolean firstTimeIn = preferences.getBoolean(KEY_FIRST_TIME_IN, true);
+        preferences.edit()
+                .putBoolean(KEY_FIRST_TIME_IN, false)
+                .apply();
+        if (!firstTimeIn) {
+            new AlertDialog.Builder(this)
+                    .setTitle("提醒")
+                    .setMessage("是否查看使用说明（需要网络查看在线页面）？")
+                    .setNeutralButton("不用了", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing
+                        }
+                    })
+                    .setPositiveButton("好的", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            gotoIntro();
+                        }
+                    })
+                    .show();
+        }
     }
 
     @Override
@@ -90,10 +123,14 @@ public class ListActivity extends AppCompatActivity implements AdapterView.OnIte
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
             startActivity(intent);
         } else if (item.getItemId() == R.id.menu_open_intro) {
-            Intent intent = new Intent(this, IntroActivity.class);
-            startActivity(intent);
+            gotoIntro();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void gotoIntro() {
+        Intent intent = new Intent(this, IntroActivity.class);
+        startActivity(intent);
     }
 
     @Override

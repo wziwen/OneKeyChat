@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -15,9 +16,11 @@ import com.ziwenwen.onekeychat.view.CustomWebView;
 public class IntroActivity extends AppCompatActivity {
 
     CustomWebView webView;
+    View loadingView;
     private WebViewClient webViewClient = new WebViewClient() {
         @Override
         public void onPageFinished(WebView view, String url) {
+            loadingView.setVisibility(View.GONE);
             injectCSS();
             super.onPageFinished(view, url);
         }
@@ -33,6 +36,7 @@ public class IntroActivity extends AppCompatActivity {
 
         setContentView(R.layout.activitty_intro);
         webView = findViewById(R.id.custom_web_view);
+        loadingView = findViewById(R.id.progress_bar);
         webView.setWebViewClient(webViewClient);
         webView.loadUrl("https://note.youdao.com/share/mobile.html?id=9ffb958bf8cd50318b71bc48282d0cfe&type=note#/");
     }
