@@ -13,4 +13,9 @@
         android:title="打开无障碍权限"
         android:enabled="true"/>
 
+    <item
+        android:id="@+id/menu_open_intro"
+        android:title="使用说明"
+        android:enabled="true"/>
+
 </menu>

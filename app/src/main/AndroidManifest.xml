@@ -26,7 +26,8 @@
                 <!-- <action android:name="android.intent.action.CREATE_SHORTCUT" /> -->
             </intent-filter>
         </activity>
-        <activity android:name=".EditTaskActivity"/>
+        <activity android:name=".EditTaskActivity"
+                  android:screenOrientation="portrait" />
         <activity
         android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
         android:exported="true"
@@ -36,6 +37,8 @@
             android:name="com.yalantis.ucrop.UCropActivity"
             android:theme="@style/AppTheme.NoTitle"
             android:screenOrientation="portrait" />
+        <activity android:name=".IntroActivity"
+                  android:screenOrientation="portrait" />
 
         <service
             android:name=".WeixinCallAS"
@@ -54,7 +57,6 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
-
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/one_app_widget_info"/>

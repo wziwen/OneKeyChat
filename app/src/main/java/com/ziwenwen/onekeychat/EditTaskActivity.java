@@ -55,9 +55,9 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
         } else {
             btnDelete.setVisibility(View.GONE);
         }
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+//        if (getSupportActionBar() != null) {
+//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        }
 
         etName = findViewById(R.id.et_name);
         ivIcon = findViewById(R.id.iv_icon);
@@ -222,7 +222,7 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
         }
         oneKeyChat(etName.getText().toString(),
                 cbVideoChat.isChecked(),
-                cbVideoChat.isChecked()
+                cbGroupChat.isChecked()
                 );
     }
 

@@ -65,7 +65,7 @@ public class ListActivity extends AppCompatActivity implements AdapterView.OnIte
 
         TaskEntity taskEntity = new TaskEntity();
         taskEntity.loadFromIntent(intent);
-        OpenHelper.oneKeyChat(this, taskEntity.getName(), taskEntity.getIsVideoChat() == 1, taskEntity.getIsVideoChat() == 1);
+        OpenHelper.oneKeyChat(this, taskEntity.getName(), taskEntity.getIsVideoChat() == 1, taskEntity.getIsGroupChat() == 1);
     }
 
     private void trackEvent(String event) {
@@ -88,6 +88,9 @@ public class ListActivity extends AppCompatActivity implements AdapterView.OnIte
             startActivityForResult(intent, REQUEST_ADD_OR_MODIFY);
         } else if (item.getItemId() == R.id.menu_open_setting) {
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+            startActivity(intent);
+        } else if (item.getItemId() == R.id.menu_open_intro) {
+            Intent intent = new Intent(this, IntroActivity.class);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
