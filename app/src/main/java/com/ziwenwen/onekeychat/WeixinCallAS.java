@@ -118,20 +118,26 @@ public class WeixinCallAS extends AccessibilityService {
                 } else if (2 == currentStep) {
                     // 找到视频聊天
                     AccessibilityNodeInfo node = findNodeByName(rootWindowNode, "视频聊天");
+                    if (node == null) {
+                        node = findNodeByName(rootWindowNode, "视频通话");
+                    }
+                    if (node == null) {
+                        node = findNodeByName(rootWindowNode, "语音聊天");
+                    }
                     if (node != null) {
                         Log.d(TAG, "step 2 finish");
                         clickNodeAndParent(node);
                         currentStep++;
                         node.recycle();
-                    } else {
+//                    } else {
                         // 群语音聊天入口叫 "语音聊天", 个人才叫视频聊天. 这里做一下兼容
-                        node = findNodeByName(rootWindowNode, "语音聊天");
-                        if (node != null) {
-                            Log.d(TAG, "step 2 finish");
-                            clickNodeAndParent(node);
-                            currentStep++;
-                            node.recycle();
-                        }
+//                        node = findNodeByName(rootWindowNode, "语音聊天");
+//                        if (node != null) {
+//                            Log.d(TAG, "step 2 finish");
+//                            clickNodeAndParent(node);
+//                            currentStep++;
+//                            node.recycle();
+//                        }
                     }
                 } else if (3 == currentStep) {
                     if (isGroupChat) {
@@ -213,8 +219,14 @@ public class WeixinCallAS extends AccessibilityService {
         AccessibilityNodeInfo node;
         if (isVideoChat) {
             node = findNodeByName(rootWindowNode, "视频聊天");
+            if (node == null) {
+                node = findNodeByName(rootWindowNode, "视频通话");
+            }
         } else {
             node = findNodeByName(rootWindowNode, "语音聊天");
+            if (node == null) {
+                node = findNodeByName(rootWindowNode, "语音通话");
+            }
         }
         if (node != null) {
             Log.d(TAG, "step 3 finish");

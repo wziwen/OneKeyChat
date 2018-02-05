@@ -58,7 +58,7 @@ public class ListActivity extends AppCompatActivity implements AdapterView.OnIte
         preferences.edit()
                 .putBoolean(KEY_FIRST_TIME_IN, false)
                 .apply();
-        if (!firstTimeIn) {
+        if (firstTimeIn) {
             new AlertDialog.Builder(this)
                     .setTitle("提醒")
                     .setMessage("是否查看使用说明（需要网络查看在线页面）？")
