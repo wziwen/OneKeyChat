@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -55,9 +56,9 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
         } else {
             btnDelete.setVisibility(View.GONE);
         }
-//        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        }
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         etName = findViewById(R.id.et_name);
         ivIcon = findViewById(R.id.iv_icon);
@@ -129,6 +130,17 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
             case R.id.iv_icon:
                 selectImage();
                 break;
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

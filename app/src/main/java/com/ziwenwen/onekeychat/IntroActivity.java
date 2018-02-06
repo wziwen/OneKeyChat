@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -30,7 +31,7 @@ public class IntroActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getSupportActionBar() != null) {
-//            getSupportActionBar().setdishome(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         setTitle("使用说明");
 
@@ -39,6 +40,17 @@ public class IntroActivity extends AppCompatActivity {
         loadingView = findViewById(R.id.progress_bar);
         webView.setWebViewClient(webViewClient);
         webView.loadUrl("https://note.youdao.com/share/mobile.html?id=9ffb958bf8cd50318b71bc48282d0cfe&type=note#/");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     // Inject CSS method: read style.css from assets folder
