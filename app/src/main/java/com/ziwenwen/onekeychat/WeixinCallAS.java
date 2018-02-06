@@ -167,6 +167,7 @@ public class WeixinCallAS extends AccessibilityService {
                             clickNodeAndParent(nodeInfo);
                             nodeInfo.recycle();
                             currentStep++;
+                            name = null;
                         }
                     }
                 } catch (Exception e) {
