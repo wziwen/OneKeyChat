@@ -6,6 +6,7 @@ import android.util.Log;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.stat.MtaSDkException;
 import com.tencent.stat.StatService;
+import com.tencent.stat.common.StatConstants;
 
 /**
  * Created by ziwen.wen on 2018/1/17.
@@ -29,7 +30,7 @@ public class App extends Application {
         try {
             // 第三个参数必须为：com.tencent.stat.common.StatConstants.VERSION
             StatService.startStatService(this, null,
-                    com.tencent.stat.common.StatConstants.VERSION);
+                    StatConstants.VERSION);
             Log.d("MTA", "MTA初始化成功");
         } catch (MtaSDkException e) {
             // MTA初始化失败
