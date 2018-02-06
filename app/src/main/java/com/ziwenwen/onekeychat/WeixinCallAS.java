@@ -95,6 +95,7 @@ public class WeixinCallAS extends AccessibilityService {
 
         int eventType = event.getEventType();
         AccessibilityNodeInfo rootWindowNode = getRootInActiveWindow();
+        Log.d(TAG, "Contetn desc: " + rootWindowNode.getContentDescription());
         switch (eventType) {
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
             case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
@@ -117,27 +118,12 @@ public class WeixinCallAS extends AccessibilityService {
                     }
                 } else if (2 == currentStep) {
                     // 找到视频聊天
-                    AccessibilityNodeInfo node = findNodeByName(rootWindowNode, "视频聊天");
-                    if (node == null) {
-                        node = findNodeByName(rootWindowNode, "视频通话");
-                    }
-                    if (node == null) {
-                        node = findNodeByName(rootWindowNode, "语音聊天");
-                    }
+                    AccessibilityNodeInfo node = findNodeByNames(rootWindowNode, "视频聊天", "视频通话", "语音聊天");
                     if (node != null) {
                         Log.d(TAG, "step 2 finish");
                         clickNodeAndParent(node);
                         currentStep++;
                         node.recycle();
-//                    } else {
-                        // 群语音聊天入口叫 "语音聊天", 个人才叫视频聊天. 这里做一下兼容
-//                        node = findNodeByName(rootWindowNode, "语音聊天");
-//                        if (node != null) {
-//                            Log.d(TAG, "step 2 finish");
-//                            clickNodeAndParent(node);
-//                            currentStep++;
-//                            node.recycle();
-//                        }
                     }
                 } else if (3 == currentStep) {
                     if (isGroupChat) {
@@ -218,15 +204,9 @@ public class WeixinCallAS extends AccessibilityService {
         // 找到视频聊天
         AccessibilityNodeInfo node;
         if (isVideoChat) {
-            node = findNodeByName(rootWindowNode, "视频聊天");
-            if (node == null) {
-                node = findNodeByName(rootWindowNode, "视频通话");
-            }
+            node = findNodeByNames(rootWindowNode, "视频聊天", "视频通话");
         } else {
-            node = findNodeByName(rootWindowNode, "语音聊天");
-            if (node == null) {
-                node = findNodeByName(rootWindowNode, "语音通话");
-            }
+            node = findNodeByNames(rootWindowNode, "语音聊天", "语音通话");
         }
         if (node != null) {
             Log.d(TAG, "step 3 finish");
@@ -243,11 +223,21 @@ public class WeixinCallAS extends AccessibilityService {
      * 点击控件和对应的父控件
      */
     private void clickNodeAndParent(AccessibilityNodeInfo node) {
-        node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+        boolean result;
+        if (node.isClickable()) {
+            result = node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+            if (result) {
+                Log.d(TAG, "click success on node");
+                return;
+            }
+        }
         AccessibilityNodeInfo parent = node.getParent();
         while (parent != null) {
             if (parent.isClickable()) {
-                parent.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                result = parent.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                if (result) {
+                    Log.d(TAG, "click success on parent");
+                }
                 break;
             }
             AccessibilityNodeInfo temp = parent;
@@ -294,12 +284,43 @@ public class WeixinCallAS extends AccessibilityService {
                 if (name.equals(node.getText().toString())) {
                     return node;
                 }
-                node.recycle();
             }
         } else {
             for (int i = 0; i < node.getChildCount(); i++) {
-                if (node.getChild(i) != null) {
-                    AccessibilityNodeInfo ret = findNodeByName(node.getChild(i), name);
+                AccessibilityNodeInfo child = node.getChild(i);
+                if (child != null) {
+                    AccessibilityNodeInfo ret = findNodeByName(child, name);
+                    if (child != ret) {
+                        child.recycle();
+                    }
+                    if (ret != null) {
+                        return ret;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static AccessibilityNodeInfo findNodeByNames(AccessibilityNodeInfo node, String... names) {
+        if (node.getChildCount() == 0) {
+            if (node.getText() != null) {
+                Log.d(TAG, "findNodeByName:" + node.getText().toString());
+                for (String name : names) {
+                    if (name.equals(node.getText().toString())) {
+                        return node;
+                    }
+                }
+//                node.recycle();
+            }
+        } else {
+            for (int i = 0; i < node.getChildCount(); i++) {
+                AccessibilityNodeInfo child = node.getChild(i);
+                if (child != null) {
+                    AccessibilityNodeInfo ret = findNodeByNames(child, names);
+                    if (child != ret) {
+                        child.recycle();
+                    }
                     if (ret != null) {
                         return ret;
                     }
