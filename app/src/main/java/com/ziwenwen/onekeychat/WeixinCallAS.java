@@ -2,6 +2,8 @@ package com.ziwenwen.onekeychat;
 
 import android.accessibilityservice.AccessibilityService;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
@@ -15,14 +17,44 @@ import java.util.List;
 public class WeixinCallAS extends AccessibilityService {
 
     private static final String TAG = "WeixinCallAS";
-    private static final int MAX_WATCH_TIME = 5 * 60 * 1000; // 避免一直监听, 如果超过时间就不再解析
+    private static final int MAX_WATCH_TIME = 8 * 60 * 1000; // 避免一直监听, 如果超过时间就不再解析
+
+    public static final int MSG_INIT = 100;
+    public static final int MSG_DO_TASK = 101;
+
     private String name;
     private boolean isVideoChat;
     private boolean isGroupChat;
-    int currentStep =  -1;
+    int currentStep = -1;
     long taskStartTime = 0;
 
     private boolean hasPermission = false;
+
+    private Handler handler = new Handler(new Handler.Callback() {
+
+        @Override
+        public boolean handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_INIT:
+                    try {
+                        parseInitData((Intent) msg.obj);
+                        handler.removeMessages(MSG_DO_TASK);
+                        doTask();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case MSG_DO_TASK:
+                    try {
+                        doTask();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+            return false;
+        }
+    });
 
     @Override
     public void onCreate() {
@@ -50,6 +82,12 @@ public class WeixinCallAS extends AccessibilityService {
                 Toast.makeText(this, "权限开启", Toast.LENGTH_SHORT).show();
             }
         }
+        handler.obtainMessage(MSG_INIT, intent)
+                .sendToTarget();
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void parseInitData(Intent intent) {
         if (intent != null) {
             taskStartTime = System.currentTimeMillis();
             currentStep = 0;
@@ -58,7 +96,6 @@ public class WeixinCallAS extends AccessibilityService {
             isGroupChat = intent.getBooleanExtra("isGroupChat", false);
             Log.d(TAG, "onStartCommand:" + name);
         }
-        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
@@ -69,93 +106,93 @@ public class WeixinCallAS extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
+
+    }
+
+    private void doTask() {
         // 确定需要时才执行
+        long startTime = System.currentTimeMillis();
         boolean disable = TextUtils.isEmpty(name);
         if (disable) {
             Log.d(TAG, "name is empty, disable");
             return;
         }
-        disable = taskStartTime + MAX_WATCH_TIME < System.currentTimeMillis();
-        if (disable) {
-            Log.d(TAG, "time over, disable");
+        AccessibilityNodeInfo rootWindowNode = getRootInActiveWindow();
+        if (rootWindowNode == null || !"com.tencent.mm".equals(rootWindowNode.getPackageName())) {
+            Log.d(TAG, "root view is null, return");
+            checkIfResume();
             return;
         }
-
-        try {
-            doTask(event);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void doTask(AccessibilityEvent event) {
-        Log.d(TAG, "onAccessibilityEvent: " + event.toString());
-        String className = event.getClassName().toString();
-        Log.d(TAG, "onAccessibilityEvent class: " + className);
-
-        int eventType = event.getEventType();
-        AccessibilityNodeInfo rootWindowNode = getRootInActiveWindow();
         Log.d(TAG, "Contetn desc: " + rootWindowNode.getContentDescription());
-        switch (eventType) {
-            case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
-            case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
-                if (0 == currentStep) {
-                    AccessibilityNodeInfo node = findNodeByName(rootWindowNode, name);
-                    if (node != null) {
-                        Log.d(TAG, "step 0 finish");
-                        clickNodeAndParent(node);
-                        currentStep++;
-                        node.recycle();
-                    }
-                } else if (1 == currentStep) {
-                    // 找到更多按钮
-                    AccessibilityNodeInfo node = findNodeByDescription(rootWindowNode, "更多功能按钮，");
-                    if (node != null) {
-                        Log.d(TAG, "step 1 finish");
-                        clickNodeAndParent(node);
-                        currentStep++;
-                        node.recycle();
-                    }
-                } else if (2 == currentStep) {
-                    // 找到视频聊天
-                    AccessibilityNodeInfo node = findNodeByNames(rootWindowNode, "视频聊天", "视频通话", "语音聊天");
-                    if (node != null) {
-                        Log.d(TAG, "step 2 finish");
-                        clickNodeAndParent(node);
-                        currentStep++;
-                        node.recycle();
-                    }
-                } else if (3 == currentStep) {
-                    if (isGroupChat) {
-                        // 找到ListView下面的所有CheckBox
-                        try {
-                                List<AccessibilityNodeInfo> checkList = findNodeByClass(rootWindowNode, CheckBox.class.getName());
-                            if (checkList.size() > 0) {
-                                for (AccessibilityNodeInfo checkBox : checkList) {
-                                    if (!checkBox.isChecked()) {
-                                        clickNodeAndParent(checkBox);
-                                    }
-                                    checkBox.recycle();
-                                }
-                                AccessibilityNodeInfo nodeInfo = findNodeByName(rootWindowNode, "开始");
-                                if (nodeInfo != null) {
-                                    clickNodeAndParent(nodeInfo);
-                                    nodeInfo.recycle();
-                                    currentStep ++;
-                                }
+        if (0 == currentStep) {
+            AccessibilityNodeInfo node = findNodeByName(rootWindowNode, name);
+            if (node != null) {
+                Log.d(TAG, "step 0 finish");
+                clickNodeAndParent(node);
+                currentStep++;
+                node.recycle();
+            }
+        } else if (1 == currentStep) {
+            // 找到更多按钮
+            AccessibilityNodeInfo node = findNodeByDescription(rootWindowNode, "更多功能按钮，");
+            if (node != null) {
+                Log.d(TAG, "step 1 finish");
+                clickNodeAndParent(node);
+                currentStep++;
+                node.recycle();
+            }
+        } else if (2 == currentStep) {
+            // 找到视频聊天
+            AccessibilityNodeInfo node = findNodeByNames(rootWindowNode, "视频聊天", "视频通话", "语音聊天");
+            if (node != null) {
+                Log.d(TAG, "step 2 finish");
+                clickNodeAndParent(node);
+                currentStep++;
+                node.recycle();
+            }
+        } else if (3 == currentStep) {
+            if (isGroupChat) {
+                // 找到ListView下面的所有CheckBox
+                try {
+                    List<AccessibilityNodeInfo> checkList = findNodeByClass(rootWindowNode, CheckBox.class.getName());
+                    if (checkList.size() > 0) {
+                        for (AccessibilityNodeInfo checkBox : checkList) {
+                            if (!checkBox.isChecked()) {
+                                clickNodeAndParent(checkBox);
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            checkBox.recycle();
                         }
-                    } else {
-                        clickVideoChat(rootWindowNode);
+                        AccessibilityNodeInfo nodeInfo = findNodeByName(rootWindowNode, "开始");
+                        if (nodeInfo != null) {
+                            clickNodeAndParent(nodeInfo);
+                            nodeInfo.recycle();
+                            currentStep++;
+                        }
                     }
-                } else if (4 == currentStep) {
-                    clickVideoChat(rootWindowNode);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                break;
+            } else {
+                clickVideoChat(rootWindowNode);
+            }
+        } else if (4 == currentStep) {
+//            clickVideoChat(rootWindowNode);
         }
         rootWindowNode.recycle();
+
+        checkIfResume();
+        Log.d(TAG, "do task time: " + (System.currentTimeMillis() - startTime));
+    }
+
+    private void checkIfResume() {
+        boolean timeOver= taskStartTime + MAX_WATCH_TIME < System.currentTimeMillis();
+        if (!timeOver && !TextUtils.isEmpty(name)) {
+            Message msg = handler.obtainMessage(MSG_DO_TASK);
+            handler.sendMessageDelayed(msg, 200);
+            Log.d(TAG, "wait for next run");
+        } else {
+            Log.d(TAG, "task finish");
+        }
     }
 
     private List<AccessibilityNodeInfo> findNodeByClass(AccessibilityNodeInfo node, String name) {
@@ -179,6 +216,7 @@ public class WeixinCallAS extends AccessibilityService {
         }
         return list;
     }
+
     private AccessibilityNodeInfo findOneNodeByClass(AccessibilityNodeInfo node, String name) {
         if (node.getChildCount() == 0) {
             CharSequence className = node.getClassName();
@@ -228,7 +266,7 @@ public class WeixinCallAS extends AccessibilityService {
             result = node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
             if (result) {
                 Log.d(TAG, "click success on node");
-                return;
+//                return;
             }
         }
         AccessibilityNodeInfo parent = node.getParent();

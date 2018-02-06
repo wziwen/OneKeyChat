@@ -42,7 +42,7 @@ public class App extends Application {
         CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(this);
         strategy.setAppVersion(BuildConfig.VERSION_NAME + "_" + BuildConfig.BUILD_TYPE);      //App的版本
 
-        CrashReport.setIsDevelopmentDevice(this, BuildConfig.DEBUG);
+        CrashReport.setIsDevelopmentDevice(this, false);
         CrashReport.initCrashReport(this, "bf4958041a", true, strategy);
     }
 
