@@ -11,6 +11,8 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
+import com.tencent.bugly.crashreport.CrashReport;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +44,7 @@ public class WeixinCallAS extends AccessibilityService {
                         doTask();
                     } catch (Exception e) {
                         e.printStackTrace();
+                        CrashReport.postCatchedException(e);
                     }
                     break;
                 case MSG_DO_TASK:
@@ -49,6 +52,7 @@ public class WeixinCallAS extends AccessibilityService {
                         doTask();
                     } catch (Exception e) {
                         e.printStackTrace();
+                        CrashReport.postCatchedException(e);
                     }
                     break;
             }
