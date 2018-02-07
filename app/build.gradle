@@ -34,6 +34,30 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    applicationVariants.all { variant ->
+        if (variant.buildType.name == 'release') {
+            variant.assemble.doLast {
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('release.apk')) {
+                        def fileName = "常聊助手_${defaultConfig.versionName}_build_${defaultConfig.versionCode}_${releaseTime()}"
+                        def outputPath = "../"
+                        copy {
+                            from outputFile
+                            into outputPath
+                            rename { fileName + ".apk" }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+def releaseTime() {
+    return new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("GMT+8"))
 }
 
 dependencies {
