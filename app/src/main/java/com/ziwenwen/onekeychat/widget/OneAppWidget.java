@@ -111,7 +111,5 @@ public class OneAppWidget extends AppWidgetProvider {
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
     }
 
-
-
 }
 

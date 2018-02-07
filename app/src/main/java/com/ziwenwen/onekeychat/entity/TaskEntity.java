@@ -99,7 +99,7 @@ public class TaskEntity implements Serializable {
             return;
         }
         name = bundle.getString("name");
-        isVideoChat = bundle.getBoolean("isVideoChat") ? 0 : 1;
-        isGroupChat = bundle.getBoolean("isGroupChat") ? 0 : 1;
+        isVideoChat = bundle.getBoolean("isVideoChat") ? 1 : 0;
+        isGroupChat = bundle.getBoolean("isGroupChat") ? 1 : 0;
     }
 }
