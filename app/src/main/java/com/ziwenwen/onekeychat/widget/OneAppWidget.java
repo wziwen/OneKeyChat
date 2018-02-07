@@ -40,10 +40,10 @@ public class OneAppWidget extends AppWidgetProvider {
 
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_one_or_two);
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        int maxWidth = 400;
+        int maxWidth = 500;
         if (wm != null) {
-            Display display = wm.getDefaultDisplay();
-            maxWidth = display.getWidth();
+//            Display display = wm.getDefaultDisplay();
+//            maxWidth = display.getWidth();
         }
         if (entity != null) {
             if (!TextUtils.isEmpty(entity.getName())) {
@@ -57,7 +57,8 @@ public class OneAppWidget extends AppWidgetProvider {
             }
             Intent configIntent = new Intent(context, ListActivity.class);
             entity.saveToIntent(configIntent);
-            PendingIntent configPendingIntent = PendingIntent.getActivity(context, 0, configIntent, 0);
+//            PendingIntent configPendingIntent = PendingIntent.getActivity(context, 0, configIntent, 0);
+            PendingIntent configPendingIntent = PendingIntent.getActivity(context, appWidgetId, configIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             remoteViews.setViewVisibility(WIDGET_RES, View.VISIBLE);
             remoteViews.setOnClickPendingIntent(WIDGET_RES, configPendingIntent);

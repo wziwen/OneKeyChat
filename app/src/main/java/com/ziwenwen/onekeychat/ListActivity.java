@@ -98,6 +98,14 @@ public class ListActivity extends AppCompatActivity implements AdapterView.OnIte
 
         TaskEntity taskEntity = new TaskEntity();
         taskEntity.loadFromIntent(intent);
+
+        // 本地的数据可能更新了, 这里用最新的数据
+        for (TaskEntity entity : TaskManager.getInstance().getAllTasks()) {
+            if (entity.getId().equals(taskEntity.getId())) {
+                taskEntity = entity;
+                break;
+            }
+        }
         OpenHelper.oneKeyChat(this, taskEntity.getName(), taskEntity.getIsVideoChat() == 1, taskEntity.getIsGroupChat() == 1);
     }
 

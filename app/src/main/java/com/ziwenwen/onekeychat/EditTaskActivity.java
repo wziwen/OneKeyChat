@@ -249,6 +249,7 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
         shortcutIntent.setClass(context, clazz);
 
         taskEntity.saveToIntent(shortcutIntent);
+        shortcutIntent.putExtra("type", "type_shot_cut");
         // 设置这条属性，可以使点击快捷方式后关闭其他的任务栈的其他activity，然后创建指定的acticity(强制打开微信首页)
         shortcutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         Intent shortcut = new Intent(Intent.ACTION_CREATE_SHORTCUT);
