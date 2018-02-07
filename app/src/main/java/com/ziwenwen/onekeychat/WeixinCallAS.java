@@ -147,7 +147,7 @@ public class WeixinCallAS extends AccessibilityService {
             }
         } else if (2 == currentStep) {
             // 找到视频聊天
-            AccessibilityNodeInfo node = findNodeByNames(rootWindowNode, "视频聊天", "视频通话", "语音聊天");
+            AccessibilityNodeInfo node = findNodeByNames(rootWindowNode, "视频聊天", "视频通话", "语音聊天", "语音通话");
             if (node != null) {
                 Log.d(TAG, "step 2 finish");
                 clickNodeAndParent(node);
