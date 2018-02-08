@@ -56,7 +56,7 @@ android {
 
 }
 
-def releaseTime() {
+static def releaseTime() {
     return new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("GMT+8"))
 }
 

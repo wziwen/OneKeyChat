@@ -87,7 +87,7 @@ public class TaskEntity implements Serializable {
 
     public void saveToIntent(Intent intent) {
         Bundle bundle = new Bundle();
-        bundle.putLong("task_id", id);
+        bundle.putLong("task_id", id == null ? -1 : id);
         bundle.putString("name", name);
         bundle.putBoolean("isVideoChat", isVideoChat == 1);
         bundle.putBoolean("isGroupChat", isGroupChat == 1);
@@ -99,7 +99,10 @@ public class TaskEntity implements Serializable {
         if(bundle == null) {
             return;
         }
-        id = bundle.getLong("task_id");
+        id = bundle.getLong("task_id", -1);
+        if (id == -1) {
+            id = null;
+        }
         name = bundle.getString("name");
         isVideoChat = bundle.getBoolean("isVideoChat") ? 1 : 0;
         isGroupChat = bundle.getBoolean("isGroupChat") ? 1 : 0;
