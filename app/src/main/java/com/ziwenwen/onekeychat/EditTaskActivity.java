@@ -160,6 +160,7 @@ public class EditTaskActivity extends AppCompatActivity implements View.OnClickL
                                for (TaskEntity entity : TaskManager.getInstance().getAllTasks()) {
                                    if (entity.getId().equals(taskEntity.getId())) {
                                        TaskManager.getInstance().getAllTasks().remove(entity);
+                                       break;
                                    }
                                }
                                setResult(RESULT_OK);
