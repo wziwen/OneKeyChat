@@ -86,7 +86,7 @@
                         android:textColor="@color/black"
                         android:textSize="16sp" />
 
-                    <android.support.v7.widget.SwitchCompat
+                    <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/cb_video_chat"
                         android:layout_marginRight="@dimen/activity_horizontal_margin"
                         android:layout_centerVertical="true"
@@ -114,7 +114,7 @@
                         android:textColor="@color/black"
                         android:textSize="16sp" />
 
-                    <android.support.v7.widget.SwitchCompat
+                    <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/cb_group_chat"
                         android:layout_marginRight="@dimen/activity_horizontal_margin"
                         android:layout_centerVertical="true"
